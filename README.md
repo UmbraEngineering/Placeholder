@@ -26,21 +26,9 @@ The first one, `simple.js`, is just that, a very simple, value-based placeholder
 </html>
 ```
 
-A class is added to inputs that are currently displaying a placeholder so that you can style them yourself, in addition to using the native CSS `::placeholder` selector.
-
-```css
-.-placeholder,  /* For the polyfill */
-::placeholder,  /* CSS 3 */
-::-moz-placeholder,  /* Mozilla */
-::-webkit-placeholder {  /* Webkit */
-	color: #888;
-}
-```
-
 ##### Caveats/Notes
 
 * The simple polyfill changes the value of the input field, so where a natively supported browser will report the value as empty `""`, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the `input.__placeholder` property, which is a flag representing if the placeholder is active.
-* There is no automatic restyling like in native browsers, so it is suggested that at minimum a color change is added to your own styles to present placeholders as being different from actual values.
 
 
 

@@ -1,6 +1,6 @@
 
 // 
-// HTML5 Placeholder Attribute Polyfill (Simple)
+// HTML5 Placeholder Attribute Polyfill (Span)
 // 
 // Author: James Brumond <james@jbrumond.me> (http://www.jbrumond.me)
 // 

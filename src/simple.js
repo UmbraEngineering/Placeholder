@@ -4,20 +4,6 @@
 // 
 // Author: James Brumond <james@jbrumond.me> (http://www.jbrumond.me)
 // 
-// -------------------------------------------------------------
-// 
-// NOTE:
-// This polyfill does not change the styles of placeholder text in polyfilled browsers. It is
-// recomended that you add styles similar to the following to your document to insure that users
-// can tell what's a placeholder and what's a given value:
-// 
-//   .-placeholder,  /* For the polyfill */
-//   ::placeholder,  /* CSS 3 */
-//   ::-moz-placeholder,  /* Mozilla */
-//   ::-webkit-placeholder {  /* Webkit */
-//       color: #888;
-//   }
-// 
 
 (function(window, document, undefined) {
 
@@ -64,6 +50,11 @@
 	else {
 		usingMutation = false;
 	}
+
+// -------------------------------------------------------------
+
+	// Add some basic default styling for placeholders
+	firstStylesheet().addRule('.-placeholder', 'color:#888;', 0);
 
 // -------------------------------------------------------------
 	
@@ -113,22 +104,25 @@
 		}
 
 		function updatePlaceholder() {
-			var old = currentPlaceholder;
-			var current = getPlaceholder();
+			// Run this asynchronously to make sure all needed updates happen before we run checks
+			setTimeout(function() {
+				var old = currentPlaceholder;
+				var current = getPlaceholder();
 
-			// If the placeholder attribute has changed
-			if (old !== current) {
-				// If the placeholder is currently shown
-				if (elem.__placeholder) {
-					elem.value = current;
+				// If the placeholder attribute has changed
+				if (old !== current) {
+					// If the placeholder is currently shown
+					if (elem.__placeholder) {
+						elem.value = current;
+					}
 				}
-			}
 
-			// Make sure that elem.__placeholder stays acurate, even if the placeholder or value are
-			// manually changed via JavaScript
-			if (elem.value !== current) {
-				elem.__placeholder = false;
-			}
+				// Make sure that elem.__placeholder stays acurate, even if the placeholder or value are
+				// manually changed via JavaScript
+				if (elem.__placeholder && elem.value !== current) {
+					elem.__placeholder = false;
+				}
+			}, 0);
 		}
 
 		function checkPlaceholder() {
@@ -257,6 +251,22 @@
 	// where e.getAttribute('placeholder') !== e.attributes.placeholder.nodeValue
 	function getPlaceholderFor(elem) {
 		return elem.getAttribute('placeholder') || (elem.attributes.placeholder && elem.attributes.placeholder.nodeValue);
+	}
+
+// -------------------------------------------------------------
+
+	// Get the first stylesheet in the document, or, if there are none, create/inject
+	// one and return it.
+	function firstStylesheet() {
+		var sheet = document.styleSheets && document.styleSheets[0];
+		if (! sheet) {
+			var head = document.head || document.getElementsByTagName('head')[0];
+			var style = document.createElement('style');
+			style.appendChild(document.createTextNode(''));
+			document.head.appendChild(style);
+			sheet = style.sheet;
+		}
+		return sheet;
 	}
 
 }(window, document));
