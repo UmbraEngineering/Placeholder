@@ -123,6 +123,12 @@
 					elem.value = current;
 				}
 			}
+
+			// Make sure that elem.__placeholder stays acurate, even if the placeholder or value are
+			// manually changed via JavaScript
+			if (elem.value !== current) {
+				elem.__placeholder = false;
+			}
 		}
 
 		function checkPlaceholder() {

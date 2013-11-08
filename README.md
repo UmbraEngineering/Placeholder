@@ -39,5 +39,5 @@ A class is added to inputs that are currently displaying a placeholder so that y
 
 ##### Caveats
 
-* The simple polyfill changes the value of the input field, so where a natively supported browser will report the value as empty `""`, polyfilled browsers will report the value of an empty field as being the value of the placeholder.
+* The simple polyfill changes the value of the input field, so where a natively supported browser will report the value as empty `""`, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the `input.__placeholder` property, which is a flag representing if the placeholder is active.
 * There is no automatic restyling like in native browsers, so it is suggested that at minimum a color change is added to your own styles to present placeholders as being different from actual values.
