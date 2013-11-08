@@ -70,7 +70,7 @@ A class is added to inputs that are currently displaying a placeholder as well a
 .-placeholder {
 	color: #888;
 }
-.-polyfill-input {
+.-placeholder-input {
 	/*  ...  */
 }
 
