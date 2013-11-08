@@ -10,7 +10,6 @@
 	// Don't run the polyfill if it isn't needed
 	if ('placeholder' in document.createElement('input')) {
 		document.placeholderPolyfill = function() { /*  no-op */ };
-		document.placeholderPolyfill.hideOnFocus = false;
 		document.placeholderPolyfill.active = false;
 		return;
 	}
@@ -48,13 +47,13 @@
 	
 	// No event-based auto-update
 	else {
-		usingMutation = false;
+		// pass
 	}
 
 // -------------------------------------------------------------
 
 	// Add some basic default styling for placeholders
-	firstStylesheet().addRule('.-placeholder', 'color:#888;', 0);
+	firstStylesheet().addRule('.-placeholder', 'color: #888;', 0);
 
 // -------------------------------------------------------------
 	
@@ -101,6 +100,11 @@
 		// Use onpropertychange for auto-updating
 		else if (elem.attachEvent && 'onpropertychange' in elem) {
 			addEvent(elem, 'propertychange', updatePlaceholder);
+		}
+	
+		// No event-based auto-update
+		else {
+			// pass
 		}
 
 		function updatePlaceholder() {

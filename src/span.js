@@ -4,283 +4,280 @@
 // 
 // Author: James Brumond <james@jbrumond.me> (http://www.jbrumond.me)
 // 
-// -------------------------------------------------------------
-// 
-// NOTE:
-// This polyfill does not change the styles of placeholder text in polyfilled browsers. It is
-// recomended that you add styles similar to the following to your document to insure that users
-// can tell what's a placeholder and what's a given value:
-// 
-//   .-placeholder,  /* For the polyfill */
-//   ::placeholder,  /* CSS 3 */
-//   ::-moz-placeholder,  /* Mozilla */
-//   ::-webkit-placeholder {  /* Webkit */
-//       color: #888;
-//   }
-// 
 
 (function(window, document, undefined) {
 
-	// Some unique bugs in IE6- have to be handled seperately... ugh.
-	var oldIE = false;
-	
-	// A list of all inputs in the DOM
+	// Don't run the polyfill if it isn't needed
+	if ('placeholder' in document.createElement('input')) {
+		document.placeholderPolyfill = function() { /*  no-op */ };
+		document.placeholderPolyfill.active = false;
+		return;
+	}
+
+	// Fetch NodeLists of the needed element types
 	var inputs = document.getElementsByTagName('input');
+	var textareas = document.getElementsByTagName('textarea');
+
+	// 
+	// Define the exposed polyfill methods for manual calls
+	// 
+	document.placeholderPolyfill = function(elems) {
+		elems = elems ? validElements(elems) : validElements(inputs, textareas);
+		each(elems, polyfillElement);
+	};
+
+	// Expose whether or not the polyfill is in use (false means native support)
+	document.placeholderPolyfill.active = true;
+
+	// Run automatically
+	document.placeholderPolyfill();
+
+// -------------------------------------------------------------
 	
-	// Are mutation events being used to auto-update?
-	var usingMutation = true;
-
-}(window, document));
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * HTML5 Input Placeholder Polyfill
- */
-
-(function() {
+	// Use mutation events for auto-updating
+	if (document.addEventListener) {
+		document.addEventListener('DOMAttrModified', document.placeholderPolyfill);
+		document.addEventListener('DOMNodeInserted', document.placeholderPolyfill);
+	}
 	
-	/**
-	 * Some unique bugs in IE6- have to be handled seperately... ugh.
-	 */
-	var oldIE = false;
+	// Use onpropertychange for auto-updating
+	else if (document.attachEvent && 'onpropertychange' in document) {
+		document.attachEvent('onpropertychange', document.placeholderPolyfill);
+	}
 	
-	/**
-	 * The color to display placeholders in
-	 */
-	var placeholderColor = '#aaa';
+	// No event-based auto-update
+	else {
+		// pass
+	}
+
+// -------------------------------------------------------------
+
+	// Add some basic default styling for placeholders
+	firstStylesheet().addRule('.-placeholder', 'color: #888;', 0);
+
+// -------------------------------------------------------------
 	
-	/**
-	 * A list of all inputs in the DOM
-	 */
-	var inputs = document.getElementsByTagName('input');
-	
-	/**
-	 * Are mutation events being used to auto-update?
-	 */
-	var usingMutation = true;
-	
-	/**
-	 * The placeholder fix object
-	 */
-	var placeholderFix = {
+	// 
+	// Polyfill a single, specific element
+	// 
+	function polyfillElement(elem) {
+		// If the element is already polyfilled, skip it
+		if (elem.__placeholder) {
+			return updatePlaceholder();
+		}
+
+		// Is there already a value in the field? If so, don't replace it with the placeholder
+		var placeholder;
+		drawPlaceholder();
+		checkPlaceholder();
+
+		// Define the events that cause these functions to be fired
+		addEvent(elem, 'keyup', checkPlaceholder);
+		addEvent(elem, 'keyDown', checkPlaceholder);
+		addEvent(elem, 'blur', checkPlaceholder);
+		addEvent(elem, 'focus', hidePlaceholder);
+		addEvent(elem, 'click', hidePlaceholder);
+		addEvent(placeholder, 'click', hidePlaceholder);
+		addEvent(window, 'resize', redrawPlaceholder);
+
+		// Use mutation events for auto-updating
+		if (elem.addEventListener) {
+			addEvent(elem, 'DOMAttrModified', updatePlaceholder);
+		}
 		
-		// Initialize a node for the placeholder fix
-		init: function(input) {
-			if (input._placeholder) {return;}
-			
-			input._placeholder = {
-				node: createElement('div', {
-					style: {
-						position: 'absolute',
-						display: 'block',
-						color: placeholderColor,
-						margin: '0',
-						padding: '0',
-						cursor: 'text'
-					}
-				}),
-				enabled: function() {
-					return (input.type === 'text' || input.type === 'password');
-				},
-				value: input.getAttribute('placeholder'),
-				visible: false,
-				set: function(value) {
-					input._placeholder.value = value;
-					placeholderFix.redraw(input);
+		// Use onpropertychange for auto-updating
+		else if (elem.attachEvent && 'onpropertychange' in elem) {
+			addEvent(elem, 'propertychange', updatePlaceholder);
+		}
+	
+		// No event-based auto-update
+		else {
+			// pass
+		}
+
+		function drawPlaceholder() {
+			placeholder = elem.__placeholder = createElement('span', {
+				innerHTML: getPlaceholderFor(elem),
+				style: {
+					position: 'absolute',
+					display: 'none',
+					margin: '0',
+					padding: '0',
+					cursor: 'text'
 				}
-			};
-			
-			// Use a setter to auto-update when the property is changed
-			if (defineProperty) {
-				defineProperty(input, 'placeholder', {
-					set: function(value) {
-						input._placeholder.set(value);
-						return value;
-					},
-					get: function(value) {
-						return input._placeholder.value;
-					}
-				});
-			}
-			
-			// Replace getAttribute/setAttribute to add placeholder support
-			if (! oldIE) {
-				try {
-					var proto = input.constructor.prototype;
-					input.setAttribute = function(attr, value) {
-						if (attr === 'placeholder') {
-							input.placeholder = value;
-							if (! defineProperty) {
-								input._placeholder.set(value);
-							}
-						}
-						return proto.setAttribute.call(input, attr, value);
-					};
-					input.getAttribute = function(attr) {
-						if (attr === 'placeholder') {
-							return input._placeholder.value;
-						}
-						return proto.getAttribute.call(input, attr);
-					};
-				} catch (e) {
-					// IE6 Bug: Can't access input.constructor.prototype.getAttribute/setAttribute
-					// in the needed way to extend the native methods. Basically, when combined with
-					// no support for getters/setters, this means that dynamic placholders can't be
-					// done in this browser. This can be worked around by using the internal method
-					// input._placeholder.set(...) if the developer has to support IE6.
-					oldIE = true;
-				}
-			}
-			
-			// Draw the placholder
-			placeholderFix.redraw(input);
-			
-			// Bind the needed events for show/hide/reposition
-			var
-			onresize = function() {
-				placeholderFix.reposition(input);
-			},
-			onfocus = function() {
-				placeholderFix.hide(input);
-				input.focus();
-			},
-			onblur = function() {
-				placeholderFix.show(input);
-			};
-			addEventSimple(window, 'resize', onresize);
-			addEventSimple(input._placeholder.node, 'click', onfocus);
-			addEventSimple(input, 'focus', onfocus);
-			addEventSimple(input, 'blur', onblur);
-		},
-		
-		// Redraw a placeholder for an input
-		redraw: function(input) {
-			placeholderFix.init(input);
-			
-			// Hide the placeholder node
-			placeholderFix.hide(input);
-			
-			// Update the value if needed
-			var node = input._placeholder.node;
-			node.innerHTML = input.placeholder || '';
-			
-			// Update any styles as needed
-			var zIndex = getStyle(input, 'zIndex');
-			zIndex = (zIndex === 'auto') ? 99999 : zIndex;
-			setStyle(node, {
-				zIndex: (zIndex || 99999) + 1,
-				backgroundColor: getStyle(input, 'backgroundColor'),
-				fontStyle: getStyle(input, 'fontStyle'),
-				fontVariant: getStyle(input, 'fontVariant'),
-				fontWeight: getStyle(input, 'fontWeight'),
-				fontSize: getStyle(input, 'fontSize'),
-				fontFamily: getStyle(input, 'fontFamily')
 			});
-			
-			// Do any repositioning needed
-			placeholderFix.reposition(input);
-			
-			// Re-show the placeholder node
-			placeholderFix.show(input);
-		},
-		
-		// Show the placeholder for an element
-		show: function(input) {
-			if (! input._placeholder.visible && input._placeholder.enabled()) {
-				input.parentNode.appendChild(input._placeholder.node);
-				input._placeholder.visible = true;
+
+			elem.parentNode.appendChild(placeholder);
+
+			redrawPlaceholder();
+		}
+
+		function redrawPlaceholder() {
+			// Update some basic styles to match that of the input
+			var zIndex = getStyle(elem, 'zIndex');
+			zIndex = (zIndex === 'auto') ? 99999 : zIndex;
+			setStyle(placeholder, {
+				zIndex: (zIndex || 99999) + 1,
+				backgroundColor: 'transparent'
+			});
+
+			// Fix an old IE bug
+			if (elem.offsetParent && getStyle(elem.offsetParent, 'position') === 'static') {
+				elem.offsetParent.style.position = 'relative';
 			}
-		},
-		
-		// Hide the placeholder for an element
-		hide: function(input) {
-			if (input._placeholder.visible && input._placeholder.enabled()) {
-				input.parentNode.removeChild(input._placeholder.node);
-				input._placeholder.visible = false;
-			}
-		},
-		
-		// Reposition the placeholder for an element
-		reposition: function(input) {
-			var offset = getOffset(input);
-			// Fix a positioning bug in older IE versions
-			if (oldIE && input.offsetParent && getStyle(input.offsetParent, 'position') === 'static') {
-				input.offsetParent.style.position = 'relative';
-			}
-			setStyle(input._placeholder.node, {
+
+			// Reposition the span to make sure it stays in place
+			var offset = getOffset(elem);
+			setStyle(placeholder, {
 				top: offset.top + 'px',
 				left: offset.left + 'px'
 			});
-		},
-		
-		// The event function used for auto-updating
-		autoUpdate: function(evt) {
-			evt = evt || window.event;
-			var node = evt.target || evt.srcElement;
-			var nodeName = node && (node.nodeName || node.tagName).toLowerCase();
-			if (nodeName === 'input') {
-				placeholderFix.redraw(node);
+		}
+
+		function updatePlaceholder() {
+			placeholder.innerHTML = getPlaceholderFor(elem);
+			redrawPlaceholder();
+		}
+
+		function checkPlaceholder() {
+			if (elem.value) {
+				hidePlaceholder();
+			} else {
+				showPlaceholder();
 			}
 		}
-		
-	};
-	
-	/**
-	 * Use mutation events for auto-updating
-	 */
-	if (document.addEventListener) {
-		document.addEventListener('DOMAttrModified', placeholderFix.autoUpdate);
-		document.addEventListener('DOMNodeInserted', placeholderFix.autoUpdate);
+
+		function showPlaceholder() {
+			placeholder.style.display = 'block';
+			addClass(placeholder, '-placeholder');
+			addClass(elem, '-placeholder-input');
+		}
+
+		function hidePlaceholder() {
+			placeholder.style.display = 'none';
+			removeClass(placeholder, '-placeholder');
+			removeClass(elem, '-placeholder-input');
+			elem.focus();
+		}
 	}
-	/**
-	 * Use onpropertychange for auto-updating
-	 */
-	else if (document.attachEvent && 'onpropertychange' in document) {
-		document.attachEvent('onpropertychange', placeholderFix.autoUpdate);
-	}
-	/**
-	 * No event-based auto-update
-	 */
-	else {
-		usingMutation = false;
-	}
+
+// -------------------------------------------------------------
 	
-// ----------------------------------------------------------------------------
-//  Helper Functions
-	
-	// Define getters/setters
-	var defineProperty = Object.defineProperty;
-	if (! defineProperty && '__defineSetter__' in document.createElement('input')) {
-		defineProperty = function(obj, prop, accessors) {
-			if (accessors.get) {
-				obj.__defineGetter__(prop, accessors.get);
+	// 
+	// Build a list of valid (can have a placeholder) elements from the given parameters
+	// 
+	function validElements() {
+		var result = [ ];
+
+		each(arguments, function(arg) {
+			if (typeof arg.length !== 'number') {
+				arg = [ arg ];
 			}
-			if (accessors.set) {
-				obj.__defineSetter__(prop, accessors.set);
-			}
-		};
+
+			result.push.apply(result, filter(arg, isValidElement));
+		});
+
+		return result;
 	}
+
+	// 
+	// Check if a given element supports the placeholder attribute
+	// 
+	function isValidElement(elem) {
+		var tag = (elem.nodeName || '').toLowerCase();
+		return (tag === 'textarea' || (tag === 'input' && (elem.type === 'text' || elem.type === 'password')));
+	}
+
+// -------------------------------------------------------------
 	
-	// Attaches an event handler
-	function addEventSimple(obj, evt, fn) {
+	function addEvent(obj, event, func) {
 		if (obj.addEventListener) {
-			obj.addEventListener(evt, fn, false);
+			obj.addEventListener(event, func, false);
 		} else if (obj.attachEvent) {
-			obj.attachEvent('on' + evt, fn);
+			obj.attachEvent('on' + event, func);
 		}
-	};
-	
+	}
+
+	function removeEvent(obj, event, func) {
+		if (obj.removeEventListener) {
+			obj.removeEventListener(event, func, false);
+		} else if (obj.detachEvent) {
+			obj.detachEvent('on' + event, func);
+		}
+	}
+
+// -------------------------------------------------------------
+
+	function each(arr, func) {
+		if (arr.forEach) {
+			return arr.forEach(func);
+		}
+
+		for (var i = 0, c = arr.length; i < c; i++) {
+			func.call(null, arr[i], i, arr);
+		}
+	}
+
+	function filter(arr, func) {
+		if (arr.filter) {
+			return arr.filter(func);
+		}
+
+		var result = [ ];
+		for (var i = 0, c = arr.length; i < c; i++) {
+			if (func.call(null, arr[i], i, arr)) {
+				result.push(arr[i]);
+			}
+		}
+
+		return result;
+	}
+
+// -------------------------------------------------------------
+
+	var regexCache = { };
+	function classNameRegex(cn) {
+		if (! regexCache[cn]) {
+			regexCache[cn] = new RegExp('(^|\\s)+' + cn + '(\\s|$)+', 'g');
+		}
+
+		return regexCache[cn];
+	}
+
+	function addClass(elem, cn) {
+		elem.className += ' ' + cn;
+	}
+
+	function removeClass(elem, cn) {
+		elem.className = elem.className.replace(classNameRegex(cn), ' ');
+	}
+
+// -------------------------------------------------------------
+
+	// Internet Explorer 10 in IE7 mode was giving me the wierest error
+	// where e.getAttribute('placeholder') !== e.attributes.placeholder.nodeValue
+	function getPlaceholderFor(elem) {
+		return elem.getAttribute('placeholder') || (elem.attributes.placeholder && elem.attributes.placeholder.nodeValue);
+	}
+
+// -------------------------------------------------------------
+
+	// Get the first stylesheet in the document, or, if there are none, create/inject
+	// one and return it.
+	function firstStylesheet() {
+		var sheet = document.styleSheets && document.styleSheets[0];
+		if (! sheet) {
+			var head = document.head || document.getElementsByTagName('head')[0];
+			var style = document.createElement('style');
+			style.appendChild(document.createTextNode(''));
+			document.head.appendChild(style);
+			sheet = style.sheet;
+		}
+		return sheet;
+	}
+
+// -------------------------------------------------------------
+
 	// Used internally in getStyle()
 	function getStyleValue(elem, prop) {
 		if (elem.currentStyle) {
@@ -291,7 +288,7 @@
 			return elem.style[prop];
 		}
 		return null;
-	};
+	}
 	
 	// Get a style property from an element
 	function getStyle(elem, prop) {
@@ -304,7 +301,7 @@
 			style = getStyleValue(elem, prop);
 		}
 		return style;
-	};
+	}
 	
 	// Set style properties to an element
 	function setStyle(elem, props) {
@@ -313,7 +310,9 @@
 				elem.style[i] = props[i];
 			}
 		}
-	};
+	}
+
+// -------------------------------------------------------------
 	
 	// Create an element
 	function createElement(tag, props) {
@@ -328,31 +327,22 @@
 			}
 		}
 		return elem;
-	};
+	}
+
+// -------------------------------------------------------------
 	
 	// Find the offset position of a given element
-	function getOffset(input) {
+	function getOffset(elem) {
 		return {
-			top: input.offsetTop + parseFloat(getStyle(input, 'paddingTop')),
-			left: input.offsetLeft + parseFloat(getStyle(input, 'paddingLeft'))
+			top:
+				elem.offsetTop +
+				parseFloat(getStyle(elem, 'paddingTop')) +
+				parseFloat(getStyle(elem, 'borderTopWidth')),
+			left:
+				elem.offsetLeft +
+				parseFloat(getStyle(elem, 'paddingLeft')) +
+				parseFloat(getStyle(elem, 'borderLeftWidth'))
 		};
-	};
-
-// ----------------------------------------------------------------------------
-//  Start Running
-	
-	function start() {
-		for (var i = 0, c = inputs.length; i < c; i++) {
-			placeholderFix.init(inputs[i]);
-		}
-	};
-	
-	if (document.readyState === 'complete') {
-		start();
-	} else {
-		addEventSimple(window, 'load', start);
 	}
-	
-}());
 
-/* End of file placeholder.js */
+}(window, document));
