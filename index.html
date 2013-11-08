@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Placeholder by UmbraEngineering</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Placeholder</h1>
+        <p>Different implementations of HTML5 placeholder polyfills/shims for different use cases</p>
+        <p class="view"><a href="https://github.com/UmbraEngineering/Placeholder">View the Project on GitHub <small>UmbraEngineering/Placeholder</small></a></p>
+        <ul>
+          <li><a href="https://github.com/UmbraEngineering/Placeholder/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/UmbraEngineering/Placeholder/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/UmbraEngineering/Placeholder">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="placeholder" class="anchor" href="#placeholder"><span class="octicon octicon-link"></span></a>Placeholder</h1>
+
+<p>Different implementations of HTML5 placeholder polyfills/shims for different use cases</p>
+
+<h2>
+<a name="implementations" class="anchor" href="#implementations"><span class="octicon octicon-link"></span></a>Implementations</h2>
+
+<h3>
+<a name="simplejs" class="anchor" href="#simplejs"><span class="octicon octicon-link"></span></a>simple.js</h3>
+
+<p>The first one, <code>simple.js</code>, is just that, a very simple, value-based placeholder polyfill. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The simple placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Placeholder Test<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;form&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">placeholder=</span><span class="s">"My Field Placeholder"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"./simple.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+<h5>
+<a name="caveatsnotes" class="anchor" href="#caveatsnotes"><span class="octicon octicon-link"></span></a>Caveats/Notes</h5>
+
+<ul>
+<li>The simple polyfill changes the value of the input field, so where a natively supported browser will report the value as empty <code>""</code>, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the <code>input.__placeholder</code> property, which is a flag representing if the placeholder is active.</li>
+</ul><h3>
+<a name="spanjs" class="anchor" href="#spanjs"><span class="octicon octicon-link"></span></a>span.js</h3>
+
+<p>The <code>span.js</code> polyfill works by positioning a span directly over top of the input field which contains the polyfill text. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The span placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Placeholder Test<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;form&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">placeholder=</span><span class="s">"My Field Placeholder"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"./span.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+<p>A class is added to inputs that are currently displaying a placeholder as well as to the placeholder span itself so that you can style them yourself, in addition to using the native CSS <code>::placeholder</code> selector.</p>
+
+<div class="highlight highlight-css"><pre><span class="c">/* For the polyfill */</span>
+<span class="nc">.-placeholder</span> <span class="p">{</span>
+    <span class="k">color</span><span class="o">:</span> <span class="m">#888</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nc">.-placeholder-input</span> <span class="p">{</span>
+    <span class="c">/*  ...  */</span>
+<span class="p">}</span>
+
+
+<span class="o">:</span><span class="nd">:placeholder</span><span class="o">,</span>  <span class="c">/* CSS 3 */</span>
+<span class="o">:</span><span class="nd">:-moz-placeholder</span><span class="o">,</span>  <span class="c">/* Mozilla */</span>
+<span class="o">:</span><span class="nd">:-webkit-placeholder</span> <span class="p">{</span>  <span class="c">/* Webkit */</span>
+    <span class="k">color</span><span class="o">:</span> <span class="m">#888</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="caveatsnotes-1" class="anchor" href="#caveatsnotes-1"><span class="octicon octicon-link"></span></a>Caveats/Notes</h5>
+
+<ul>
+<li>The main caveat to this implementation is that it creates a new element in the DOM, which, under certain circumstances, could lead to unexpected rendering. That said, it comes with the advantage of never manipulating the field's <code>value</code> attribute.</li>
+</ul><h3>
+<a name="ie-behaviorjs" class="anchor" href="#ie-behaviorjs"><span class="octicon octicon-link"></span></a>ie-behavior.js</h3>
+
+<p>The <code>ie-behavior.js</code> polyfill is specifically targeted at legacy versions of Internet Explorer, and should be used when these are the only browsers you are worried about polyfilling. It makes use of IE's proprietary CSS behaviors to extend the input and textarea elements.</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Placeholder Test<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;form&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">placeholder=</span><span class="s">"My Field Placeholder"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"./ie-behavior.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+
+<p>A class is added to inputs that are currently displaying a placeholder so that you can style them yourself, in addition to using the native CSS <code>::placeholder</code> selector.</p>
+
+<div class="highlight highlight-css"><pre><span class="nc">.-placeholder</span><span class="o">,</span>  <span class="c">/* For the polyfill */</span>
+<span class="o">:</span><span class="nd">:placeholder</span><span class="o">,</span>  <span class="c">/* CSS 3 */</span>
+<span class="o">:</span><span class="nd">:-moz-placeholder</span><span class="o">,</span>  <span class="c">/* Mozilla */</span>
+<span class="o">:</span><span class="nd">:-webkit-placeholder</span> <span class="p">{</span>  <span class="c">/* Webkit */</span>
+    <span class="k">color</span><span class="o">:</span> <span class="m">#888</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="caveatsnotes-2" class="anchor" href="#caveatsnotes-2"><span class="octicon octicon-link"></span></a>Caveats/Notes</h5>
+
+<ul>
+<li>Only works in legacy IE.</li>
+<li>This polyfill changes the value of the input field, so where a natively supported browser will report the value as empty <code>""</code>, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the <code>input.__placeholder</code> property, which is a flag representing if the placeholder is active.</li>
+<li>There is no automatic restyling like in native browsers, so it is suggested that at minimum a color change is added to your own styles to present placeholders as being different from actual values.</li>
+</ul><h3>
+<a name="ie-behavior-spanjs" class="anchor" href="#ie-behavior-spanjs"><span class="octicon octicon-link"></span></a>ie-behavior-span.js</h3>
+
+<p>The <code>ie-behavior-span.js</code> polyfill is a combination of the ideas behind the <code>span.js</code> and <code>ie-behavior.js</code> polyfills, using IE's behavior feature to extend inputs and textareas in such a way that they use spans to display placeholders. For more info, basically just read those two sections above.</p>
+
+<div class="highlight highlight-html"><pre><span class="cp">&lt;!doctype html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Placeholder Test<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;form&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">placeholder=</span><span class="s">"My Field Placeholder"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;/form&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"./ie-behavior-span.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</pre></div>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/UmbraEngineering">UmbraEngineering</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
