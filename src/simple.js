@@ -61,18 +61,18 @@
 	// Polyfill a single, specific element
 	// 
 	function polyfillElement(elem) {
-		// Keep track of placeholder changes so we can fire off updates correctly
-		var currentPlaceholder = getPlaceholderFor(elem);
-		function getPlaceholder() {
-			return currentPlaceholder = getPlaceholderFor(elem);
-		}
-
 		// If the element is already polyfilled, skip it
 		if (elem.__placeholder != null) {
 			// Make sure that if the placeholder is already shown, that it is at least up-to-date
 			if (elem.__placeholder) {
 				elem.value = getPlaceholder();
 			}
+		}
+
+		// Keep track of placeholder changes so we can fire off updates correctly
+		var currentPlaceholder = getPlaceholderFor(elem);
+		function getPlaceholder() {
+			return currentPlaceholder = getPlaceholderFor(elem);
 		}
 
 		// Is there already a value in the field? If so, don't replace it with the placeholder
