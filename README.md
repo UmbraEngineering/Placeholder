@@ -9,6 +9,8 @@ Implementations
 
 ### simple.js
 
+[download simple.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/simple.js)
+
 The first one, `simple.js`, is just that, a very simple, value-based placeholder polyfill. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The simple placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.
 
 ```html
@@ -33,6 +35,8 @@ The first one, `simple.js`, is just that, a very simple, value-based placeholder
 
 
 ### span.js
+
+[download span.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/span.js)
 
 The `span.js` polyfill works by positioning a span directly over top of the input field which contains the polyfill text. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The span placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.
 
@@ -78,6 +82,8 @@ A class is added to inputs that are currently displaying a placeholder as well a
 
 ### ie-behavior.js
 
+[download ie-behavior.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/ie-behavior.js)
+
 The `ie-behavior.js` polyfill is specifically targeted at legacy versions of Internet Explorer, and should be used when these are the only browsers you are worried about polyfilling. It makes use of IE's proprietary CSS behaviors to extend the input and textarea elements.
 
 ```html
@@ -114,6 +120,8 @@ A class is added to inputs that are currently displaying a placeholder so that y
 
 
 ### ie-behavior-span.js
+
+[download ie-behavior-span.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/ie-behavior-span.js)
 
 The `ie-behavior-span.js` polyfill is a combination of the ideas behind the `span.js` and `ie-behavior.js` polyfills, using IE's behavior feature to extend inputs and textareas in such a way that they use spans to display placeholders. For more info, basically just read those two sections above.
 
