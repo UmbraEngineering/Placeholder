@@ -34,62 +34,68 @@
 	// Polyfill a single, specific element
 	// 
 	function polyfillElement(elem) {
-		if (! isValidElement(elem)) {return;}
-
 		// If the element is already polyfilled, skip it
-		if (elem.__placeholder != null) {
-			// Make sure that if the placeholder is already shown, that it is at least up-to-date
-			if (elem.__placeholder) {
-				elem.value = getPlaceholder();
-			}
-
-			return;
-		}
-
-		// Keep track of placeholder changes so we can fire off updates correctly
-		var currentPlaceholder = getPlaceholderFor(elem);
-		function getPlaceholder() {
-			return currentPlaceholder = getPlaceholderFor(elem);
+		if (elem.__placeholder) {
+			return updatePlaceholder();
 		}
 
 		// Is there already a value in the field? If so, don't replace it with the placeholder
-		if (elem.value) {
-			elem.__placeholder = false;
-			if (elem.value === getPlaceholder()) {
-				doShowPlaceholder();
-			}
-		} else {
-			showPlaceholder();
-		}
+		var placeholder;
+		drawPlaceholder();
+		checkPlaceholder();
 
 		// Define the events that cause these functions to be fired
-		addEvent(elem, 'keyup',           checkPlaceholder);
-		addEvent(elem, 'keyDown',         checkPlaceholder);
-		addEvent(elem, 'blur',            checkPlaceholder);
-		addEvent(elem, 'focus',           hidePlaceholder);
-		addEvent(elem, 'click',           hidePlaceholder);
-		addEvent(elem, 'propertychange',  updatePlaceholder);
+		addEvent(elem, 'keyup', checkPlaceholder);
+		addEvent(elem, 'keyDown', checkPlaceholder);
+		addEvent(elem, 'blur', checkPlaceholder);
+		addEvent(elem, 'focus', hidePlaceholder);
+		addEvent(elem, 'click', hidePlaceholder);
+		addEvent(elem, 'propertychange', updatePlaceholder);
+		addEvent(placeholder, 'click', hidePlaceholder);
+		addEvent(window, 'resize', redrawPlaceholder);
+
+		function drawPlaceholder() {
+			placeholder = elem.__placeholder = createElement('span', {
+				innerHTML: getPlaceholderFor(elem),
+				style: {
+					position: 'absolute',
+					display: 'none',
+					margin: '0',
+					padding: '0',
+					cursor: 'text'
+				}
+			});
+
+			elem.parentNode.appendChild(placeholder);
+
+			redrawPlaceholder();
+		}
+
+		function redrawPlaceholder() {
+			// Update some basic styles to match that of the input
+			var zIndex = getStyle(elem, 'zIndex');
+			zIndex = (zIndex === 'auto') ? 99999 : zIndex;
+			setStyle(placeholder, {
+				zIndex: (zIndex || 99999) + 1,
+				backgroundColor: 'transparent'
+			});
+
+			// Fix an old IE bug
+			if (elem.offsetParent && getStyle(elem.offsetParent, 'position') === 'static') {
+				elem.offsetParent.style.position = 'relative';
+			}
+
+			// Reposition the span to make sure it stays in place
+			var offset = getOffset(elem);
+			setStyle(placeholder, {
+				top: offset.top + 'px',
+				left: offset.left + 'px'
+			});
+		}
 
 		function updatePlaceholder() {
-			// Run this asynchronously to make sure all needed updates happen before we run checks
-			setTimeout(function() {
-				var old = currentPlaceholder;
-				var current = getPlaceholder();
-
-				// If the placeholder attribute has changed
-				if (old !== current) {
-					// If the placeholder is currently shown
-					if (elem.__placeholder) {
-						elem.value = current;
-					}
-				}
-
-				// Make sure that elem.__placeholder stays acurate, even if the placeholder or value are
-				// manually changed via JavaScript
-				if (elem.__placeholder && elem.value !== current) {
-					elem.__placeholder = false;
-				}
-			}, 0);
+			placeholder.innerHTML = getPlaceholderFor(elem);
+			redrawPlaceholder();
 		}
 
 		function checkPlaceholder() {
@@ -101,23 +107,16 @@
 		}
 
 		function showPlaceholder() {
-			if (! elem.__placeholder && ! elem.value) {
-				doShowPlaceholder();
-			}
-		}
-
-		function doShowPlaceholder() {
-			elem.__placeholder = true;
-			elem.value = getPlaceholder();
-			addClass(elem, '-placeholder');
+			placeholder.style.display = 'block';
+			addClass(placeholder, '-placeholder');
+			addClass(elem, '-placeholder-input');
 		}
 
 		function hidePlaceholder() {
-			if (elem.__placeholder) {
-				elem.__placeholder = false;
-				elem.value = '';
-				removeClass(elem, '-placeholder');
-			}
+			placeholder.style.display = 'none';
+			removeClass(placeholder, '-placeholder');
+			removeClass(elem, '-placeholder-input');
+			elem.focus();
 		}
 	}
 
@@ -217,6 +216,75 @@
 			sheet = style.sheet;
 		}
 		return sheet;
+	}
+
+// -------------------------------------------------------------
+
+	// Used internally in getStyle()
+	function getStyleValue(elem, prop) {
+		if (elem.currentStyle) {
+			return elem.currentStyle[prop];
+		} else if (window.getComputedStyle) {
+			return document.defaultView.getComputedStyle(elem, null)[prop];
+		} else if (prop in elem.style) {
+			return elem.style[prop];
+		}
+		return null;
+	}
+	
+	// Get a style property from an element
+	function getStyle(elem, prop) {
+		var style;
+		if (elem.parentNode == null) {
+			elem = document.body.appendChild(elem);
+			style = getStyleValue(elem, prop);
+			elem = document.body.removeChild(elem);
+		} else {
+			style = getStyleValue(elem, prop);
+		}
+		return style;
+	}
+	
+	// Set style properties to an element
+	function setStyle(elem, props) {
+		for (var i in props) {
+			if (props.hasOwnProperty(i)) {
+				elem.style[i] = props[i];
+			}
+		}
+	}
+
+// -------------------------------------------------------------
+	
+	// Create an element
+	function createElement(tag, props) {
+		var elem = document.createElement(tag);
+		for (var i in props) {
+			if (props.hasOwnProperty(i)) {
+				if (i === 'style') {
+					setStyle(elem, props[i]);
+				} else {
+					elem.setAttribute(i, props[i]);
+				}
+			}
+		}
+		return elem;
+	}
+
+// -------------------------------------------------------------
+	
+	// Find the offset position of a given element
+	function getOffset(elem) {
+		return {
+			top:
+				elem.offsetTop +
+				parseFloat(getStyle(elem, 'paddingTop')) +
+				parseFloat(getStyle(elem, 'borderTopWidth')),
+			left:
+				elem.offsetLeft +
+				parseFloat(getStyle(elem, 'paddingLeft')) +
+				parseFloat(getStyle(elem, 'borderLeftWidth'))
+		};
 	}
 
 }(window, document));
