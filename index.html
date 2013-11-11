@@ -1,32 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Placeholder by UmbraEngineering</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Placeholder : Different implementations of HTML5 placeholder polyfills/shims for different use cases" />
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <title>Placeholder</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Placeholder</h1>
-        <p>Different implementations of HTML5 placeholder polyfills/shims for different use cases</p>
-        <p class="view"><a href="https://github.com/UmbraEngineering/Placeholder">View the Project on GitHub <small>UmbraEngineering/Placeholder</small></a></p>
-        <ul>
-          <li><a href="https://github.com/UmbraEngineering/Placeholder/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/UmbraEngineering/Placeholder/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/UmbraEngineering/Placeholder">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/UmbraEngineering/Placeholder">View on GitHub</a>
+
+          <h1 id="project_title">Placeholder</h1>
+          <h2 id="project_tagline">Different implementations of HTML5 placeholder polyfills/shims for different use cases</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/UmbraEngineering/Placeholder/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/UmbraEngineering/Placeholder/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>
 <a name="placeholder" class="anchor" href="#placeholder"><span class="octicon octicon-link"></span></a>Placeholder</h1>
 
@@ -37,6 +41,8 @@
 
 <h3>
 <a name="simplejs" class="anchor" href="#simplejs"><span class="octicon octicon-link"></span></a>simple.js</h3>
+
+<p><a href="https://raw.github.com/UmbraEngineering/Placeholder/master/src/simple.js">download simple.js</a></p>
 
 <p>The first one, <code>simple.js</code>, is just that, a very simple, value-based placeholder polyfill. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The simple placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.</p>
 
@@ -61,6 +67,8 @@
 <li>The simple polyfill changes the value of the input field, so where a natively supported browser will report the value as empty <code>""</code>, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the <code>input.__placeholder</code> property, which is a flag representing if the placeholder is active.</li>
 </ul><h3>
 <a name="spanjs" class="anchor" href="#spanjs"><span class="octicon octicon-link"></span></a>span.js</h3>
+
+<p><a href="https://raw.github.com/UmbraEngineering/Placeholder/master/src/span.js">download span.js</a></p>
 
 <p>The <code>span.js</code> polyfill works by positioning a span directly over top of the input field which contains the polyfill text. To use it, simply include it in your document after any inputs or textareas that might have placeholders. The span placeholder makes use of mutation events to keep everything up-to-date automatically, so there should be no need to manually make update calls.</p>
 
@@ -104,6 +112,8 @@
 </ul><h3>
 <a name="ie-behaviorjs" class="anchor" href="#ie-behaviorjs"><span class="octicon octicon-link"></span></a>ie-behavior.js</h3>
 
+<p><a href="https://raw.github.com/UmbraEngineering/Placeholder/master/src/ie-behavior.js">download ie-behavior.js</a></p>
+
 <p>The <code>ie-behavior.js</code> polyfill is specifically targeted at legacy versions of Internet Explorer, and should be used when these are the only browsers you are worried about polyfilling. It makes use of IE's proprietary CSS behaviors to extend the input and textarea elements.</p>
 
 <div class="highlight highlight-html"><pre><span class="cp">&lt;!doctype html&gt;</span>
@@ -136,9 +146,10 @@
 <ul>
 <li>Only works in legacy IE.</li>
 <li>This polyfill changes the value of the input field, so where a natively supported browser will report the value as empty <code>""</code>, polyfilled browsers will report the value of an empty field as being the value of the placeholder. You can test if a placeholder is currently being displayed by checking the <code>input.__placeholder</code> property, which is a flag representing if the placeholder is active.</li>
-<li>There is no automatic restyling like in native browsers, so it is suggested that at minimum a color change is added to your own styles to present placeholders as being different from actual values.</li>
 </ul><h3>
 <a name="ie-behavior-spanjs" class="anchor" href="#ie-behavior-spanjs"><span class="octicon octicon-link"></span></a>ie-behavior-span.js</h3>
+
+<p><a href="https://raw.github.com/UmbraEngineering/Placeholder/master/src/ie-behavior-span.js">download ie-behavior-span.js</a></p>
 
 <p>The <code>ie-behavior-span.js</code> polyfill is a combination of the ideas behind the <code>span.js</code> and <code>ie-behavior.js</code> polyfills, using IE's behavior feature to extend inputs and textareas in such a way that they use spans to display placeholders. For more info, basically just read those two sections above.</p>
 
@@ -157,11 +168,16 @@
 </pre></div>
       </section>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/UmbraEngineering">UmbraEngineering</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Placeholder maintained by <a href="https://github.com/UmbraEngineering">UmbraEngineering</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
     
+
   </body>
 </html>
