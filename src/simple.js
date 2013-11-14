@@ -1,4 +1,3 @@
-
 // 
 // HTML5 Placeholder Attribute Polyfill (Simple)
 // 
@@ -67,6 +66,7 @@
 			if (elem.__placeholder) {
 				elem.value = getPlaceholder();
 			}
+			return;
 		}
 
 		// Keep track of placeholder changes so we can fire off updates correctly
