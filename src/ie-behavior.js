@@ -1,4 +1,3 @@
-
 // 
 // HTML5 Placeholder Attribute Polyfill (IE Behavior)
 // 
@@ -27,6 +26,8 @@
 	css.addRule('.-placeholder', 'color: #888;', 0);
 	css.addRule('input', 'behavior: expression(document.placeholderPolyfill(this))', 0);
 	css.addRule('textarea', 'behavior: expression(document.placeholderPolyfill(this))', 0);
+	css.addRule('input', '-ms-behavior: expression(document.placeholderPolyfill(this))', 0);
+	css.addRule('textarea', '-ms-behavior: expression(document.placeholderPolyfill(this))', 0);
 
 // -------------------------------------------------------------
 	
