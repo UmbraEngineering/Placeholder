@@ -321,6 +321,8 @@
 			if (props.hasOwnProperty(i)) {
 				if (i === 'style') {
 					setStyle(elem, props[i]);
+				} else if (i === 'innerHTML') {
+					elem.innerHTML = props[i];
 				} else {
 					elem.setAttribute(i, props[i]);
 				}
