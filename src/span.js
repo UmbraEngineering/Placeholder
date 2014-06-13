@@ -139,9 +139,9 @@
 			redrawPlaceholder();
 		}
 
-		function checkPlaceholder() {
+		function checkPlaceholder(event) {
 			if (elem.value) {
-				hidePlaceholder();
+				hidePlaceholder(event, event.type === 'blur');
 			} else {
 				showPlaceholder();
 			}
@@ -153,11 +153,13 @@
 			addClass(elem, '-placeholder-input');
 		}
 
-		function hidePlaceholder() {
+		function hidePlaceholder(event, suppressFocus) {
 			placeholder.style.display = 'none';
 			removeClass(placeholder, '-placeholder');
 			removeClass(elem, '-placeholder-input');
-			elem.focus();
+			if(! suppressFocus) {
+        elem.focus();
+      }
 		}
 	}
 
