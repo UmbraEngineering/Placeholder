@@ -157,9 +157,9 @@
 			placeholder.style.display = 'none';
 			removeClass(placeholder, '-placeholder');
 			removeClass(elem, '-placeholder-input');
-			if(! suppressFocus) {
-        elem.focus();
-      }
+			if (! suppressFocus) {
+				elem.focus();
+			}
 		}
 	}
 
