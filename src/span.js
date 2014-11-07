@@ -141,7 +141,11 @@
 
 		function checkPlaceholder(event) {
 			if (elem.value) {
-				hidePlaceholder(event, event.type === 'blur');
+                                var nofocus = true;
+                                if (event && event.type ){
+                                      nofocus = event.type === 'blur';
+                                }
+                                hidePlaceholder(event, nofocus);
 			} else {
 				showPlaceholder();
 			}
