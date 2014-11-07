@@ -80,6 +80,32 @@ A class is added to inputs that are currently displaying a placeholder as well a
 
 
 
+### span-wrap.js
+
+[download span-wrap.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/span-wrap.js) | [demo](http://umbraengineering.github.io/Placeholder/demos/span-wrap.html)
+
+The `span-wrap.js` variant works almost identically as the `span.js` except that it's also creating a second `<span>` element wrapping both the placeholder span and the input field. This way, the placeholder automatically sticks to the position of the input field, whereas with `span.js` it is positioned absolutely on the page — which can lead to unexpected behavior in case of dynamic layout changes (e.g. when modifying element class names or style values). So basically,
+
+```html
+<form>
+    <input type="text" placeholder="My Field Placeholder" />
+</form>
+```
+
+becomes
+
+```html
+<form>
+	<span style="position:relative">
+		<span style="position:absolute;display:none,margin:0,padding:0,cursor:text">My Field Placeholder</span>
+    	<input type="text" placeholder="My Field Placeholder" />
+    </span>
+</form>
+```
+
+Apart from that, there's no functional difference between `span-wrap.js` and `span.js` and the same caveats / notes apply here as well.
+
+
 ### ie-behavior.js
 
 [download ie-behavior.js](https://raw.github.com/UmbraEngineering/Placeholder/master/src/ie-behavior.js) | [demo](http://umbraengineering.github.io/Placeholder/demos/ie-behavior.html)
@@ -139,4 +165,3 @@ The `ie-behavior-span.js` polyfill is a combination of the ideas behind the `spa
 </body>
 </html>
 ```
-
