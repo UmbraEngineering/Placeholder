@@ -6,6 +6,8 @@
 // 
 
 (function(window, document, undefined) {
+        // MSIE8 does not allow vars between functions...
+	var regexCache = { };
 
 	// Don't run the polyfill if it isn't needed
 	if ('placeholder' in document.createElement('input')) {
@@ -241,7 +243,6 @@
 
 // -------------------------------------------------------------
 
-	var regexCache = { };
 	function classNameRegex(cn) {
 		if (! regexCache[cn]) {
 			regexCache[cn] = new RegExp('(^|\\s)+' + cn + '(\\s|$)+', 'g');
