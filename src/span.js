@@ -65,6 +65,7 @@
 	function polyfillElement(elem) {
 		// If the element is already polyfilled, skip it
 		if (elem.__placeholder) {
+			placeholder = elem.__placeholder; // need a reference to the placeholder for innerhtml
 			return updatePlaceholder();
 		}
 
