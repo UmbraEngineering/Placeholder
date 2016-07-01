@@ -4,6 +4,8 @@
 // Author: James Brumond <james@jbrumond.me> (http://www.jbrumond.me)
 // 
 
+// Patched by Francesco Munafò to automatically transform password fields to text fields when a placeholder is used
+
 (function(window, document, undefined) {
 
 	// Don't run the polyfill if it isn't needed
@@ -131,14 +133,26 @@
 
 		function checkPlaceholder() {
 			if (elem.value) {
+			
+				/* FRANCESCOMM START */
+				if(elem.wasPassword === true) {elem.type = 'password';}
+				/* FRANCESCOMM END */
+				
 				hidePlaceholder();
 			} else {
+				/* FRANCESCOMM START */
+				if(elem.type === 'password') {elem.wasPassword=true; elem.type = 'text';}
+				/* FRANCESCOMM END */
+				
 				showPlaceholder();
 			}
 		}
 
 		function showPlaceholder() {
 			if (! elem.__placeholder && ! elem.value) {
+				/* FRANCESCOMM START */
+				if(elem.type === 'password') {elem.wasPassword=true; elem.type = 'text';}
+				/* FRANCESCOMM END */
 				doShowPlaceholder();
 			}
 		}
